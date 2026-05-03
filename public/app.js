@@ -166,8 +166,8 @@ function renderContacts(contacts) {
         return;
     }
 
-    const modeEmojis = { agree: '✅', disagree: '❌', custom: '✏️', ignore: '🚫' };
-    const modeLabels = { agree: 'Selalu Setuju', disagree: 'Selalu Tidak Setuju', custom: 'Jawaban Custom', ignore: 'Abaikan' };
+    const modeEmojis = { agree: '✅', disagree: '❌', custom: '✏️', ai_persona: '🤖', ignore: '🚫' };
+    const modeLabels = { agree: 'Selalu Setuju', disagree: 'Selalu Tidak Setuju', custom: 'Jawaban Custom', ai_persona: 'AI Persona Khusus', ignore: 'Abaikan' };
 
     list.innerHTML = contacts.map(c => `
         <div class="rule-item" data-id="${c.id}">
@@ -232,7 +232,7 @@ async function deleteContact(id) {
 function toggleCustomField() {
     const mode = document.getElementById('contact-mode').value;
     const group = document.getElementById('custom-response-group');
-    group.style.display = (mode === 'custom' || mode === 'agree' || mode === 'disagree') ? 'block' : 'none';
+    group.style.display = (mode === 'custom' || mode === 'agree' || mode === 'disagree' || mode === 'ai_persona') ? 'block' : 'none';
 }
 
 // ── Auto Replies ────────────────────────
@@ -372,7 +372,7 @@ function renderLogs(logs) {
         return `
             <div class="log-item">
                 <div class="log-header">
-                    <span class="log-sender">${escapeHtml(log.from)}</span>
+                    <span class="log-sender">${escapeHtml(log.from)} <small>(${log.number || ''})</small></span>
                     ${log.isGroup ? `<span class="log-group">${escapeHtml(log.group)}</span>` : ''}
                     ${log.ruleApplied ? `<span class="log-rule-badge">${log.ruleApplied}</span>` : ''}
                     <span class="log-time">${date} ${time}</span>

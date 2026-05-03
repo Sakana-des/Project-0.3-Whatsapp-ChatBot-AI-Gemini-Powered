@@ -30,21 +30,23 @@ let geminiModel = null;
 
 function initGemini() {
     try {
-        geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-        console.log('✅ Gemini AI initialized (gemini-1.5-flash)');
+        geminiModel = genAI.getGenerativeModel({ model: 'gemma-3-1b-it' });
+        console.log('✅ Gemini AI initialized (gemma-3-1b-it)');
     } catch (err) {
         console.error('❌ Gemini AI init error:', err.message);
     }
 }
 
-async function askGemini(userMessage, senderName, isGroup, groupName) {
+async function askGemini(userMessage, senderName, isGroup, groupName, customPromptOverride = null) {
     if (!geminiModel) return 'Maaf, AI sedang tidak tersedia.';
 
     const contextInfo = isGroup
         ? `Pesan dari ${senderName} di grup "${groupName}".`
         : `Pesan dari ${senderName} (chat pribadi).`;
 
-    const prompt = `${config.systemPrompt}\n\nKonteks: ${contextInfo}\n\nPesan: ${userMessage}`;
+    const basePrompt = customPromptOverride || config.systemPrompt;
+    const prompt = `${basePrompt}\n\nKonteks: ${contextInfo}\n\nPesan: ${userMessage}`;
+    console.log(`[DEBUG] Final AI Prompt: ${prompt.substring(0, 150).replace(/\n/g, ' ')}...`);
 
     try {
         const result = await geminiModel.generateContent(prompt);
@@ -134,10 +136,21 @@ client.on('message', async (msg) => {
     messageLog.unshift(logEntry);
     if (messageLog.length > MAX_LOG) messageLog.pop();
 
+    let customPromptOverride = null;
+
     // ── Check contact rules (auto agree/disagree) ──
-    const contactRule = config.contactRules.find(r =>
-        senderNumber.includes(r.number) && r.enabled
-    );
+    console.log(`[DEBUG] senderName: ${senderName}, contact.number: ${contact.number}, msg.author: ${msg.author}`);
+    const contactRule = config.contactRules.find(r => {
+        // Normalize rule number (change 08... to 628...)
+        let normalizedRuleNum = r.number.trim();
+        if (normalizedRuleNum.startsWith('0')) {
+            normalizedRuleNum = '62' + normalizedRuleNum.slice(1);
+        }
+        
+        const match = senderNumber.includes(normalizedRuleNum) && r.enabled;
+        if (match) console.log(`[DEBUG] Rule matched for ${r.number} (normalized: ${normalizedRuleNum})`);
+        return match;
+    });
 
     if (contactRule) {
         let ruleResponse = null;
@@ -149,6 +162,8 @@ client.on('message', async (msg) => {
             return; // ignore this contact
         } else if (contactRule.mode === 'custom') {
             ruleResponse = contactRule.customResponse || '';
+        } else if (contactRule.mode === 'ai_persona') {
+            customPromptOverride = contactRule.customResponse || '';
         }
 
         if (ruleResponse) {
@@ -213,7 +228,7 @@ client.on('message', async (msg) => {
         cleanMessage = cleanMessage.replace(new RegExp(`@${client.info.wid.user}`, 'gi'), '').trim();
     }
 
-    const aiReply = await askGemini(cleanMessage, senderName, isGroup, groupName);
+    const aiReply = await askGemini(cleanMessage, senderName, isGroup, groupName, customPromptOverride);
     await msg.reply(aiReply);
 
     logEntry.replied = true;
