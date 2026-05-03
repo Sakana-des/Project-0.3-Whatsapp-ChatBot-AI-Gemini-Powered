@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp AI Bot — Dashboard</title>
+    <meta name="description" content="Dashboard kontrol untuk WhatsApp AI Bot berbasis Gemini API">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>
+                    </svg>
+                </div>
+                <span class="logo-text">WA Bot</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-tab="status" id="nav-status">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                </svg>
+                <span>Status</span>
+            </button>
+            <button class="nav-item" data-tab="ai-settings" id="nav-ai-settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a4 4 0 014 4c0 1.95-2 3-2 5h-4c0-2-2-3.05-2-5a4 4 0 014-4z"/><line x1="10" y1="17" x2="14" y2="17"/><line x1="10" y1="20" x2="14" y2="20"/>
+                </svg>
+                <span>AI Settings</span>
+            </button>
+            <button class="nav-item" data-tab="contacts" id="nav-contacts">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+                </svg>
+                <span>Kontak Rules</span>
+            </button>
+            <button class="nav-item" data-tab="replies" id="nav-replies">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                </svg>
+                <span>Auto Reply</span>
+            </button>
+            <button class="nav-item" data-tab="logs" id="nav-logs">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                </svg>
+                <span>Log Pesan</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="status-indicator" id="connection-badge">
+                <span class="status-dot disconnected"></span>
+                <span id="connection-text">Disconnected</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <button class="menu-toggle" id="menu-toggle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+            <h1 class="page-title" id="page-title">Status Koneksi</h1>
+        </header>
+
+        <div class="content-area">
+            <!-- ═══ STATUS TAB ═══ -->
+            <section class="tab-content active" id="tab-status">
+                <div class="status-grid">
+                    <div class="card glass qr-card" id="qr-section">
+                        <div class="card-header">
+                            <h2>Scan QR Code</h2>
+                            <p class="card-subtitle">Buka WhatsApp → Menu → Perangkat Tertaut → Tautkan Perangkat</p>
+                        </div>
+                        <div class="qr-container" id="qr-container">
+                            <div class="qr-loading">
+                                <div class="spinner"></div>
+                                <p>Menunggu QR Code...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card glass connected-card" id="connected-section" style="display:none">
+                        <div class="card-header">
+                            <div class="connected-badge">
+                                <div class="pulse-ring"></div>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <h2>Terhubung!</h2>
+                        </div>
+                        <div class="bot-info">
+                            <div class="info-row">
+                                <span class="info-label">Nama</span>
+                                <span class="info-value" id="bot-name">—</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Nomor</span>
+                                <span class="info-value" id="bot-number">—</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Platform</span>
+                                <span class="info-value" id="bot-platform">—</span>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-warning" id="btn-restart" onclick="restartBot()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                                Restart
+                            </button>
+                            <button class="btn btn-danger" id="btn-logout" onclick="logoutBot()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card glass stats-card">
+                        <h3>Statistik Hari Ini</h3>
+                        <div class="stats-grid">
+                            <div class="stat">
+                                <span class="stat-number" id="stat-messages">0</span>
+                                <span class="stat-label">Pesan Masuk</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="stat-replied">0</span>
+                                <span class="stat-label">Dibalas</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="stat-groups">0</span>
+                                <span class="stat-label">Dari Grup</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══ AI SETTINGS TAB ═══ -->
+            <section class="tab-content" id="tab-ai-settings">
+                <div class="settings-layout">
+                    <div class="card glass">
+                        <div class="card-header">
+                            <h2>🤖 Pengaturan AI</h2>
+                            <p class="card-subtitle">Atur bagaimana AI menjawab pesan</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="bot-name-input">Nama Bot</label>
+                            <input type="text" id="bot-name-input" placeholder="AI Assistant" class="input">
+                        </div>
+                        <div class="form-group">
+                            <label for="system-prompt">System Prompt</label>
+                            <p class="form-hint">Instruksi untuk AI. Tentukan kepribadian, gaya bicara, dan batasan AI.</p>
+                            <textarea id="system-prompt" class="input textarea" rows="6" placeholder="Kamu adalah asisten AI yang membantu..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="max-tokens">Panjang Jawaban Maksimal (tokens)</label>
+                            <input type="number" id="max-tokens" class="input" min="50" max="2000" value="500">
+                        </div>
+                        <div class="form-row">
+                            <div class="toggle-group">
+                                <label class="toggle">
+                                    <input type="checkbox" id="auto-reply-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <div>
+                                    <span class="toggle-label">Auto Reply Aktif</span>
+                                    <span class="toggle-hint">Bot akan membalas pesan otomatis</span>
+                                </div>
+                            </div>
+                            <div class="toggle-group">
+                                <label class="toggle">
+                                    <input type="checkbox" id="mention-only-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <div>
+                                    <span class="toggle-label">Reply Hanya Saat Di-tag</span>
+                                    <span class="toggle-hint">Di grup, bot hanya menjawab jika di-mention</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="btn-save-ai" onclick="saveAISettings()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Simpan Pengaturan
+                        </button>
+                    </div>
+
+                    <div class="card glass">
+                        <div class="card-header">
+                            <h2>💡 Tips System Prompt</h2>
+                        </div>
+                        <div class="tips-list">
+                            <div class="tip-item" onclick="useTemplate(this)">
+                                <h4>🎭 Asisten Sopan</h4>
+                                <p>Kamu adalah asisten AI yang sopan dan membantu. Jawab dengan bahasa Indonesia yang baik, singkat, dan jelas.</p>
+                            </div>
+                            <div class="tip-item" onclick="useTemplate(this)">
+                                <h4>😎 Santai & Gaul</h4>
+                                <p>Lo adalah AI yang santai dan gaul. Jawab pake bahasa informal, singkat, dan seru. Pake emoji sesekali.</p>
+                            </div>
+                            <div class="tip-item" onclick="useTemplate(this)">
+                                <h4>📚 Tutor Akademik</h4>
+                                <p>Kamu adalah tutor akademik. Jelaskan konsep dengan cara yang mudah dipahami. Berikan contoh jika perlu. Fokus pada edukasi.</p>
+                            </div>
+                            <div class="tip-item" onclick="useTemplate(this)">
+                                <h4>🛠️ Admin Grup</h4>
+                                <p>Kamu adalah admin grup WhatsApp. Bantu menjawab pertanyaan tentang jadwal, info, dan aturan grup. Ingatkan anggota yang melanggar aturan dengan sopan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══ CONTACTS RULES TAB ═══ -->
+            <section class="tab-content" id="tab-contacts">
+                <div class="card glass">
+                    <div class="card-header">
+                        <h2>📱 Aturan Per Kontak</h2>
+                        <p class="card-subtitle">Atur respon khusus berdasarkan nomor WhatsApp tertentu</p>
+                    </div>
+
+                    <div class="add-form">
+                        <h3>Tambah Aturan Baru</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="contact-name">Nama</label>
+                                <input type="text" id="contact-name" class="input" placeholder="Nama kontak">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-number">Nomor WhatsApp</label>
+                                <input type="text" id="contact-number" class="input" placeholder="628xxxxxxxxxx">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-mode">Mode</label>
+                                <select id="contact-mode" class="input select" onchange="toggleCustomField()">
+                                    <option value="agree">✅ Selalu Setuju</option>
+                                    <option value="disagree">❌ Selalu Tidak Setuju</option>
+                                    <option value="custom">✏️ Jawaban Custom</option>
+                                    <option value="ignore">🚫 Abaikan</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="custom-response-group" style="display:none">
+                                <label for="contact-custom-response">Jawaban Custom</label>
+                                <input type="text" id="contact-custom-response" class="input" placeholder="Jawaban yang akan dikirim...">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="addContact()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Tambah Aturan
+                        </button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="rules-list" id="contacts-list">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
+                            <p>Belum ada aturan kontak</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══ AUTO REPLY TAB ═══ -->
+            <section class="tab-content" id="tab-replies">
+                <div class="card glass">
+                    <div class="card-header">
+                        <h2>💬 Jawaban Otomatis (Keyword)</h2>
+                        <p class="card-subtitle">Jika pesan mengandung keyword tertentu, bot akan menjawab sesuai yang ditentukan</p>
+                    </div>
+
+                    <div class="add-form">
+                        <h3>Tambah Keyword Baru</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="reply-keyword">Keyword</label>
+                                <input type="text" id="reply-keyword" class="input" placeholder="Contoh: jadwal">
+                            </div>
+                            <div class="form-group">
+                                <label for="reply-response">Jawaban</label>
+                                <textarea id="reply-response" class="input textarea" rows="3" placeholder="Jawaban yang akan dikirim..."></textarea>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="addReply()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Tambah Keyword
+                        </button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="rules-list" id="replies-list">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                            <p>Belum ada keyword</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══ LOGS TAB ═══ -->
+            <section class="tab-content" id="tab-logs">
+                <div class="card glass">
+                    <div class="card-header">
+                        <h2>📋 Log Pesan</h2>
+                        <p class="card-subtitle">Riwayat pesan masuk dan balasan bot</p>
+                        <button class="btn btn-sm btn-ghost" onclick="refreshLogs()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                            Refresh
+                        </button>
+                    </div>
+
+                    <div class="log-list" id="log-list">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <p>Belum ada pesan</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

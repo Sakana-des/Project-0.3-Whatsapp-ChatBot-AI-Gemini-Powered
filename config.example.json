@@ -1,0 +1,25 @@
+{
+  "botName": "AI Assistant",
+  "systemPrompt": "Lo adalah AI yang santai dan gaul. Jawab pake bahasa informal, singkat, dan seru. Pake emoji sesekali.",
+  "replyOnlyWhenMentioned": true,
+  "autoReplyEnabled": true,
+  "maxTokens": 500,
+  "contactRules": [
+    {
+      "id": "sample-id",
+      "number": "628xxxxxxxxxx",
+      "name": "Contoh Nama",
+      "mode": "agree",
+      "customResponse": "",
+      "enabled": true
+    }
+  ],
+  "customReplies": [
+    {
+      "id": "1",
+      "keyword": "jadwal",
+      "response": "Silakan cek jadwal di website resmi atau hubungi admin.",
+      "enabled": true
+    }
+  ]
+}
