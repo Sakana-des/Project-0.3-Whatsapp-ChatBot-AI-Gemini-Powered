@@ -1,90 +1,99 @@
 # 🤖 WhatsApp AI Bot — Gemini Powered
 
-Bot WhatsApp otomatis yang terhubung ke akun WhatsApp Anda, didukung oleh **Google Gemini AI**.
+Bot WhatsApp otomatis yang terhubung ke akun WhatsApp Anda, didukung oleh **Google AI** (Mendukung Gemini dan Gemma 3).
 
-## ✨ Fitur
+## ✨ Fitur Terbaru & Utama
 
 | Fitur | Deskripsi |
 |---|---|
-| 🔗 Koneksi WhatsApp | Scan QR Code untuk menghubungkan akun WhatsApp Anda |
-| 🤖 AI Gemini | Jawaban cerdas menggunakan Google Gemini 2.0 Flash |
-| 📱 Reply di Grup | Bot hanya menjawab ketika Anda di-tag/mention di grup |
-| ⚙️ System Prompt | Atur kepribadian & gaya jawaban AI sesuai keinginan |
-| ✅❌ Auto Setuju/Tolak | Setting per nomor untuk selalu setuju atau tolak otomatis |
-| 💬 Keyword Reply | Jawaban otomatis berdasarkan keyword tertentu |
-| 📋 Log Pesan | Monitor semua pesan masuk dan balasan bot |
-| 🌐 Web Dashboard | Kontrol semua pengaturan melalui browser |
+| 🔗 Koneksi WhatsApp | Scan QR Code untuk menghubungkan akun WhatsApp Anda via Web. |
+| 🤖 AI Generative | Menggunakan model cerdas terbaru (Saat ini diatur menggunakan `gemma-3-1b-it` / `gemini-3-flash-preview`). |
+| 📱 Reply di Grup | Bot pintar yang bisa diatur untuk hanya membalas jika di-tag/mention di grup. |
+| ⚙️ System Prompt | Atur kepribadian, gaya bahasa, dan perilaku AI secara umum. |
+| 🎭 **AI Persona Khusus** | **[BARU]** Berikan prompt kepribadian unik ke setiap nomor yang berbeda (misal: si A dijawab dengan sinis, si B dijawab gaul). |
+| ✅❌ Kontak Rules | Mode setuju otomatis, tolak otomatis, abaikan, atau jawaban kustom per kontak. |
+| 📞 Auto Konversi Nomor | **[BARU]** Masukkan nomor dengan format lokal `08...` dan sistem otomatis mengenalinya sebagai `628...`. |
+| 💬 Keyword Reply | Jawaban statis otomatis jika pesan mengandung kata kunci tertentu. |
+| 📋 Log Pesan Detail | **[BARU]** Monitor semua chat langsung dari dashboard. Kini menampilkan **Nomor ID Asli** dari pengirim (Berguna untuk melihat ID tersembunyi `@lid` di Grup Komunitas). |
+| 🎛️ **Control Panel UI** | **[BARU]** Dilengkapi aplikasi Python UI untuk menyalakan bot secara terpisah dan tombol **Emergency Stop**. |
 
 ## 🚀 Cara Pakai
 
 ### 1. Dapatkan Gemini API Key
-Buka [Google AI Studio](https://aistudio.google.com/apikey) dan buat API key gratis.
+Buka [Google AI Studio](https://aistudio.google.com/apikey) menggunakan akun Google Anda dan buat API key gratis.
 
-### 2. Setup
+### 2. Setup Awal
 ```bash
-# Install dependencies
+# 1. Install dependencies Node.js
 npm install
 
-# Edit file .env dan masukkan API key Anda
-# GEMINI_API_KEY=your_api_key_here
+# 2. Buat file .env dari template
+cp .env.example .env
 
-# Jalankan bot
-npm start
+# 3. Edit file .env dan masukkan API key Anda di baris GEMINI_API_KEY
 ```
 
-### 3. Hubungkan WhatsApp
-1. Buka browser ke `http://localhost:3000`
-2. Scan QR Code yang muncul dengan WhatsApp Anda
-3. Bot siap digunakan! 🎉
+### 3. Menyalakan Bot
+Terdapat 2 cara untuk menyalakan bot:
 
-## 📱 Penggunaan
+**Cara A (Menggunakan Control Panel GUI):**
+```bash
+python control_panel.py
+```
+Akan terbuka jendela dengan tombol **START SYSTEM** untuk menjalankan bot dan **EMERGENCY STOP** untuk mematikan paksa semua proses.
 
-### Mengatur Jawaban AI
-Di tab **AI Settings**, Anda bisa:
-- Mengubah **System Prompt** untuk mengatur gaya jawaban AI
-- Mengaktifkan/nonaktifkan auto-reply
-- Mengatur apakah bot hanya reply saat di-tag
+**Cara B (Menggunakan Terminal Klasik):**
+```bash
+npm start
+# atau
+node server.js
+```
 
-### Mengatur Aturan Per Kontak
-Di tab **Kontak Rules**, Anda bisa:
-- **Selalu Setuju** — Bot otomatis menyetujui pesan dari nomor tertentu
-- **Selalu Tidak Setuju** — Bot otomatis menolak pesan dari nomor tertentu
-- **Jawaban Custom** — Bot menjawab dengan teks yang Anda tentukan
-- **Abaikan** — Bot tidak membalas pesan dari nomor tersebut
+### 4. Hubungkan WhatsApp
+1. Buka browser dan pergi ke `http://localhost:3000`
+2. Scan QR Code yang muncul di layar dengan HP WhatsApp Anda.
+3. Bot langsung siap bereaksi! 🎉
 
-### Auto Reply Keyword
-Di tab **Auto Reply**, tambahkan keyword dan jawaban otomatis.
-Contoh: keyword `jadwal` → jawaban `Jadwal akan diumumkan segera.`
+## 📱 Penggunaan Dashboard
 
-## 📁 Struktur File
+### Mengatur Jawaban AI (System Prompt)
+Di tab **AI Settings**, Anda dapat mengubah kepribadian utama bot (misal: menjadikannya asisten profesional atau teman gaul).
+
+### Mengatur Aturan Per Kontak (Kontak Rules)
+Fitur unggulan di mana Anda bisa mengatur perlakuan khusus ke orang tertentu:
+- **AI Persona Khusus**: Bot tetap menggunakan AI, namun dengan prompt kepribadian yang *berbeda* khusus untuk orang tersebut.
+- **Selalu Setuju / Tolak**: Mengiyakan atau menolak ajakan secara instan tanpa perlu AI.
+- **Abaikan**: Memblokir interaksi dengan nomor tersebut.
+- *Tip: Gunakan halaman **Log Pesan** untuk menyalin nomor/ID WhatsApp pengirim yang akurat (termasuk kode `@lid` di grup komunitas).*
+
+## 📁 Struktur File Utama
 
 ```
 Project 0.3/
-├── server.js          # Server utama (WhatsApp + Gemini + API)
-├── config.json        # Konfigurasi bot (User Settings)
-├── config.example.json # Template konfigurasi
-├── package.json       # Dependencies
-├── .env               # API key (RAHASIA!)
-├── .env.example       # Template environment
-├── .gitignore         # Mencegah file rahasia ter-upload
+├── server.js          # Backend utama (WhatsApp + AI Engine + API API)
+├── control_panel.py   # Launcher Python dengan tombol Emergency
+├── config.json        # Database pengaturan dari Dashboard (Otomatis)
+├── config.example.json# Template database
+├── package.json       # Dependencies Node.js
+├── .env               # File API key rahasia Anda
+├── .gitignore         # Pemblokir file rahasia untuk GitHub
 └── public/
-    ├── index.html     # Dashboard web
-    ├── style.css      # Styling dashboard
-    └── app.js         # Frontend logic
+    ├── index.html     # Tampilan web dashboard
+    ├── style.css      # Desain dashboard
+    └── app.js         # Logika interaktif dashboard
 ```
 
-## 🔒 Keamanan & Berbagi (Sharing)
+## 🔒 Keamanan & Berbagi (Publishing)
 
-Jika Anda ingin membagikan project ini (misalnya ke GitHub atau teman):
+Project ini **sudah 100% aman** untuk di-upload ke GitHub atau dibagikan ke publik karena sistem sudah dilengkapi dengan `.gitignore` tingkat lanjut.
 
-1.  **JANGAN PERNAH** membagikan file `.env` dan `config.json`. File ini berisi API Key dan daftar kontak pribadi Anda.
-2.  **JANGAN PERNAH** membagikan folder `.wwebjs_auth` dan `.wwebjs_cache`. Folder ini berisi session WhatsApp Anda.
-3.  **Gunakan `.gitignore`**: Project ini sudah dilengkapi `.gitignore` untuk mencegah file sensitif (`.env`, `config.json`, folder auth) ter-upload secara tidak sengaja.
-4.  **Template**: Orang lain cukup menyalin `.env.example` ke `.env` dan `config.example.json` ke `config.json` untuk memulai.
+Saat Anda menjalankan perintah `git push`, file-file di bawah ini **TIDAK AKAN** ter-upload demi menjaga keamanan Anda:
+1. File `.env` (API Key Anda aman).
+2. File `config.json` (Nomor telepon teman/kontak Anda aman).
+3. Folder `.wwebjs_auth/` dan `.wwebjs_cache/` (Sesi login WhatsApp web Anda sangat aman dan anti dibajak).
 
-## ⚠️ Penting
+Orang lain yang mendownload repo ini cukup menggunakan `config.example.json` dan `.env.example` sebagai panduan awal mereka.
 
-- **Jangan bagikan file `.env`** yang berisi API key Anda
-- Bot menggunakan **whatsapp-web.js** yang terhubung via WhatsApp Web
-- Pastikan koneksi internet stabil agar bot tetap aktif
-- WhatsApp bisa men-disconnect jika mendeteksi aktivitas tidak biasa
+## ⚠️ Peringatan Penggunaan API
+- Model AI (khususnya versi non-lite) memiliki batasan request gratis per menit/hari. Jika Anda menerima pesan *Terjadi kesalahan* di terminal, kemungkinan besar kuota API harian Anda dari Google sudah habis.
+- Solusi: Tunggu keesokan harinya, gunakan model `gemini-1.5-flash` / `gemma-3-1b-it`, atau gunakan API Key dari akun Google lain.
